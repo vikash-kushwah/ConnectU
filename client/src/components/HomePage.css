@@ -1,0 +1,94 @@
+/* src/components/HomePage.css */
+
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  font-size: 2.5em;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* p {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 30px;
+} */
+
+.featured-posts {
+  margin-bottom: 40px;
+}
+
+.featured-posts h2 {
+  font-size: 2em;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.post-card {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-card h3 {
+  font-size: 1.4em;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.post-card p {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.post-card button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.post-card button:hover {
+  background-color: #0056b3;
+}
+
+.cta-section {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.cta-section h2 {
+  font-size: 2em;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.cta-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #218838;
+}
