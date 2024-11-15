@@ -11,17 +11,8 @@ const PostPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        // In a real application, replace this with your actual API call
-        // const response = await axios.get(`/api/posts/${id}`);
-        // setPost(response.data);
-        
-        // For now, we'll use mock data
-        const mockPost = {
-          id: id,
-          title: `Post ${id}`,
-          content: `This is the full content of post ${id}. It's much longer than what was shown on the homepage.`
-        };
-        setPost(mockPost);
+        const response = await axios.get(`/api/posts/${id}`);
+        setPost(response.data);
       } catch (error) {
         console.error('Error fetching post:', error);
       } finally {

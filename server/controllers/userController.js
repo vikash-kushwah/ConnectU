@@ -1,4 +1,3 @@
-// server/controllers/userController.js
 const User = require('../models/User');
 
 // @desc Get all users
@@ -34,18 +33,9 @@ exports.getUserProfile = async (req, res) => {
 exports.updateUserProfile = async (req, res) => {
   try {
     const updates = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).select('-password');
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
+    const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select('-password');
     res.json(user);
   } catch (error) {
-    res.status(400).json({ message: 'Error updating profile', error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

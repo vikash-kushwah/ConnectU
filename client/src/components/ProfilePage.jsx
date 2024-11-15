@@ -1,104 +1,85 @@
-// src/components/ProfilePage.jsx
-
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import axios from '../api/axios';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
-  const [userData, setUserData] = useState({ name: '', email: '', bio: '' });
+  const [userData, setUserData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-  const token = useSelector((state) => state.auth.token); // Access the token from Redux store
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/profile', {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await axios.get('/auth/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         setUserData(response.data);
-      } catch (error) {
-        console.error('Failed to fetch user profile', error);
+      } catch (err) {
+        setError('Failed to fetch profile');
       }
     };
-
-    fetchUserProfile();
+    fetchProfile();
   }, [token]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
+    setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('http://localhost:5000/api/users/profile', userData, {
-        headers: { Authorization: `Bearer ${token}` },
+      await axios.put('/auth/profile', userData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setIsEditing(false);
-    } catch (error) {
-      console.error('Failed to update profile', error);
+    } catch (err) {
+      setError('Failed to update profile');
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-4">Profile Page</h2>
+    <div className="profile-page">
+      <h1>Profile</h1>
+      {error && <p>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2" htmlFor="name">Name</label>
+        <div>
+          <label>Name</label>
           <input
             type="text"
-            id="name"
             name="name"
             value={userData.name}
             onChange={handleChange}
-            className="border p-2 w-full"
             disabled={!isEditing}
-            required
           />
         </div>
-        <div className="mb-4">
-          <label className="block mb-2" htmlFor="email">Email</label>
+        <div>
+          <label>Email</label>
           <input
             type="email"
-            id="email"
             name="email"
             value={userData.email}
             onChange={handleChange}
-            className="border p-2 w-full"
             disabled={!isEditing}
-            required
           />
         </div>
-        <div className="mb-4">
-          <label className="block mb-2" htmlFor="bio">Bio</label>
+        <div>
+          <label>Bio</label>
           <textarea
-            id="bio"
             name="bio"
             value={userData.bio}
             onChange={handleChange}
-            className="border p-2 w-full"
             disabled={!isEditing}
           />
         </div>
-        <button
-          type="button"
-          onClick={() => setIsEditing(!isEditing)}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
+        <button type="button" onClick={() => setIsEditing(!isEditing)}>
           {isEditing ? 'Cancel' : 'Edit Profile'}
         </button>
-        {isEditing && (
-          <button
-            type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded ml-2"
-          >
-            Save Changes
-          </button>
-        )}
+        {isEditing && <button type="submit">Save</button>}
       </form>
     </div>
   );

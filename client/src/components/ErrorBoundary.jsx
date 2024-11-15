@@ -1,7 +1,5 @@
-// src/components/ErrorBoundary.jsx
-
 import React from 'react';
-import './ErrorBoundary.css'
+import './ErrorBoundary.css';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -10,19 +8,16 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
-    return { hasError: true };
+    return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can log the error to an error reporting service
     console.error("Uncaught error:", error, errorInfo);
     this.setState({ error, errorInfo });
   }
 
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
         <div className="error-boundary">
           <h1>Oops! Something went wrong.</h1>

@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPostDetails, addComment } from '../redux/postSlice';
 
-function PostDetails() {
+const PostDetails = () => {
   const { id } = useParams();
   const post = useSelector((state) => state.posts.post);
   const dispatch = useDispatch();
@@ -47,6 +47,6 @@ function PostDetails() {
       </div>
     </div>
   );
-}
+};
 
 export default PostDetails;

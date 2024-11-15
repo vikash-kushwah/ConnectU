@@ -1,4 +1,3 @@
-// server/controllers/postController.js
 const Post = require('../models/Post');
 
 // @desc Create a new post
@@ -40,7 +39,7 @@ exports.deletePost = async (req, res) => {
     }
 
     if (post.user.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Not authorized' });
     }
 
     await post.remove();
