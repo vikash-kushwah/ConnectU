@@ -1,6 +1,4 @@
-# ConnectU
-
-# UniConnect
+# UniConnect(ConnectU)
 
 UniConnect is a simple, streamlined social networking platform for college students, built using the MERN stack (MongoDB, Express.js, React.js, Node.js) with Vite.
 
