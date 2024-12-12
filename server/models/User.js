@@ -1,35 +1,21 @@
-// server/models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema({
+const userSchema = mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
-    trim: true,
-    maxlength: [50, 'Name cannot be more than 50 characters']
+    required: true,
+    trim: true
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: true,
     unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address']
+    trim: true
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters long']
-  },
-  bio: {
-    type: String,
-    default: '',
-    maxlength: [200, 'Bio cannot be more than 200 characters']
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false
+    required: true
   },
   profilePicture: {
     type: String,

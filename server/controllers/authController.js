@@ -1,4 +1,3 @@
-// server/controllers/authController.js
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
@@ -20,13 +19,7 @@ exports.register = async (req, res) => {
   }
 };
 
-
 // Login user
-
-
-// @desc Login user
-// @route POST /api/auth/login
-// @access Public
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -49,7 +42,7 @@ exports.loginUser = async (req, res) => {
 
     res.json({ token });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 

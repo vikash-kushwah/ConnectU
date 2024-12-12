@@ -1,4 +1,3 @@
-// server/server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -19,9 +18,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/posts', postRoutes);
-app.use('/users', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/users', userRoutes);
 
 // Error Handler Middleware
 app.use(errorHandler);
