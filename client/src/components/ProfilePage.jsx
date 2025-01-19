@@ -3,84 +3,40 @@ import axios from '../api/axios';
 import { useSelector } from 'react-redux';
 
 const ProfilePage = () => {
-  const [userData, setUserData] = useState({});
-  const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState('');
-  const token = useSelector((state) => state.auth.token);
+  const [userPosts, setUserPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchUserPosts = async () => {
       try {
-        const response = await axios.get('/auth/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserData(response.data);
+        setLoading(true);
+        const response = await axios.get('/posts/user/posts');
+        setUserPosts(response.data);
       } catch (err) {
-        setError('Failed to fetch profile');
+        setError(err.response?.data?.message || 'Failed to fetch posts');
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProfile();
-  }, [token]);
 
-  const handleChange = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
-  };
+    fetchUserPosts();
+  }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put('/auth/profile', userData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setIsEditing(false);
-    } catch (err) {
-      setError('Failed to update profile');
-    }
-  };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="profile-page">
-      <h1>Profile</h1>
-      {error && <p>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name</label>
-          <input
-            type="text"
-            name="name"
-            value={userData.name}
-            onChange={handleChange}
-            disabled={!isEditing}
-          />
-        </div>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={userData.email}
-            onChange={handleChange}
-            disabled={!isEditing}
-          />
-        </div>
-        <div>
-          <label>Bio</label>
-          <textarea
-            name="bio"
-            value={userData.bio}
-            onChange={handleChange}
-            disabled={!isEditing}
-          />
-        </div>
-        <button type="button" onClick={() => setIsEditing(!isEditing)}>
-          {isEditing ? 'Cancel' : 'Edit Profile'}
-        </button>
-        {isEditing && <button type="submit">Save</button>}
-      </form>
+    <div className="container mx-auto p-4">
+      <h1>Your Posts</h1>
+      <div className="space-y-4">
+        {userPosts.map(post => (
+          <div key={post._id} className="border p-4 rounded">
+            <p>{post.content}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

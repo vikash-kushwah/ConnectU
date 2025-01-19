@@ -1,55 +1,59 @@
-// src/components/HomePage.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CreatePost from './CreatePost';
 import PostCard from './PostCard';
+import LoadingSpinner from './LoadingSpinner';
+import Toast from './Toast/Toast';
+import ErrorBoundary from './ErrorBoundary';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 import './HomePage.css';
 
-const HomePage = () => {
+const HomePageContent = () => {
+  const { toast, showToast, hideToast } = useToast();
   const [featuredPosts, setFeaturedPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const { isLoggedIn, user, logout } = useAuth();
 
-  // Check if the user is logged in
+  // Fetch featured posts
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-      const userData = JSON.parse(localStorage.getItem('user')); // Retrieve user data
-      setUser(userData);
-    }
-  }, []);
+    const fetchFeaturedPosts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/posts/featured');
+        if (!response.ok) {
+          throw new Error('Failed to fetch featured posts');
+        }
+        const data = await response.json();
+        setFeaturedPosts(data);
+      } catch (err) {
+        const errorMessage = err.message;
+        setError(errorMessage);
+        showToast({ 
+          message: errorMessage,
+          type: 'error'
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // Fetch featured posts (mocked data for now)
-  useEffect(() => {
-    const mockFeaturedPosts = [
-      { id: 1, title: "Welcome to UniConnect", content: "Connect with students and alumni from your university!" },
-      { id: 2, title: "Upcoming Events", content: "Check out our calendar for networking opportunities." },
-      { id: 3, title: "Success Stories", content: "Read about how UniConnect has helped students find internships." },
-    ];
+    fetchFeaturedPosts();
+  }, [showToast]);
 
-    setFeaturedPosts(mockFeaturedPosts);
-  }, []);
-
-  // Navigation to the Sign-Up page
+  // Navigation functions
   const handleSignUp = () => {
     navigate('/register');
+    showToast({
+      message: 'Welcome to registration!',
+      type: 'info'
+    });
   };
 
-  // Navigation for reading more posts
   const handleReadMore = (postId) => {
     navigate(`/post/${postId}`);
-  };
-
-  // Handle Logout
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token from local storage
-    localStorage.removeItem('user'); // Remove user data from local storage
-    setIsLoggedIn(false); // Update state
-    setUser(null); // Clear user data
-    navigate('/'); // Redirect to home page after logout
   };
 
   return (
@@ -62,12 +66,21 @@ const HomePage = () => {
         {isLoggedIn ? (
           <div className="flex items-center">
             <img
-              src={user?.profilePicture || '/path/to/default-profile-pic.png'} // Use default image if not available
+              src={user?.profilePicture || '/path/to/default-profile-pic.png'}
               alt="Profile"
               className="w-10 h-10 rounded-full mr-2"
             />
-            <span className="mr-2">{user?.name}</span> {/* Display user name */}
-            <button onClick={handleLogout} className="text-blue-500 hover:underline">
+            <span className="mr-2">{user?.name}</span>
+            <button 
+              onClick={() => {
+                logout();
+                showToast({ 
+                  message: 'Successfully logged out',
+                  type: 'success'
+                });
+              }} 
+              className="text-blue-500 hover:underline"
+            >
               Logout
             </button>
           </div>
@@ -82,38 +95,51 @@ const HomePage = () => {
       </div>
 
       {/* Create Post Section */}
-      <CreatePost />
+      {isLoggedIn && <CreatePost />}
 
       {/* Featured Posts Section */}
       <section className="featured-posts mt-8">
         <h2 className="text-2xl font-bold mb-4">Featured Posts</h2>
         <div className="post-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {featuredPosts.map((post) => (
-            <div key={post.id} className="post-card border p-4 rounded shadow-lg">
-              <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-              <p>{post.content.substring(0, 100)}...</p>
-              <button
-                className="text-blue-500 hover:underline mt-2"
-                onClick={() => handleReadMore(post.id)}
-              >
-                Read More
-              </button>
-            </div>
-          ))}
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : error ? (
+            <div className="text-red-500 text-center p-4">{error}</div>
+          ) : (
+            featuredPosts.map((post) => (
+              <div key={post.id} className="post-card border p-4 rounded shadow-lg">
+                <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
+                <p>{post.content.substring(0, 100)}...</p>
+                <button
+                  className="text-blue-500 hover:underline mt-2"
+                  onClick={() => handleReadMore(post.id)}
+                >
+                  Read More
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
-      {/* Call-to-Action Section */}
-      <section className="cta-section mt-12 text-center">
-        <h2 className="text-2xl font-bold mb-4">Ready to get started?</h2>
-        <button
-          className="cta-button bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-          onClick={handleSignUp}
-        >
-          Sign Up Now
-        </button>
-      </section>
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+          duration={toast.duration}
+        />
+      )}
     </div>
+  );
+};
+
+const HomePage = () => {
+  return (
+    <ErrorBoundary>
+      <HomePageContent />
+    </ErrorBoundary>
   );
 };
 
